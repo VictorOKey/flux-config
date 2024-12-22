@@ -1,0 +1,30 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: prometheus-adapter
+  namespace: flux-system
+spec:
+  targetNamespace: prometheus
+  interval: 24h
+  timeout: 10m
+  releaseName: prometheus-adapter
+  chart:
+    spec:
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+      chart: prometheus-adapter
+      version: 4.11.0
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    prometheus:
+      url: http://prometheus-kube-prometheus-prometheus.prometheus.svc
+      port: 9090
+      path: ""
