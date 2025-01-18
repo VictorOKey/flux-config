@@ -79,7 +79,8 @@ metadata:
   namespace: flux-system
 spec:
   interval: 5m
-  url: https://charts.bitnami.com/bitnami
+  type: "oci"
+  url: oci://registry-1.docker.io/bitnamicharts/elasticsearch
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
