@@ -1,0 +1,62 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: demo-app
+  namespace: flux-system
+spec:
+  targetNamespace: default
+  interval: 24h
+  timeout: 10m
+  releaseName: demo-app
+  chart:
+    spec:
+      chart: demo-app
+      sourceRef:
+        kind: GitRepository
+        name: helm-cursovaya
+        namespace: flux-system
+      version: 1.0.0
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    podAnnotations:
+      vault.security.banzaicloud.io/vault-addr: "http://vault.vault.svc.cluster.local:8200"
+      vault.security.banzaicloud.io/vault-role: "helm-app-helm-app"
+      vault.security.banzaicloud.io/vault-skip-verify: "true"
+      vault.security.banzaicloud.io/vault-agent: "false"
+      vault.security.banzaicloud.io/vault-path: "kubernetes"
+    replicaCount: 1
+    image:
+      repository: johnnytengu/demo-app
+      tag: "1.0.0"
+      pullPolicy: IfNotPresent
+    vault:
+      usernameSecret: "vault:secret/data/webapp/config#username"
+    service:
+      type: ClusterIP
+      port: 80
+      portName: "http"
+    ingress:
+      enabled: true
+      annotations:
+        certManagerIssuer: "vault-issuer"
+      tls:
+        secretName: "quickstart-example-tls"
+      hosts:
+        - host: demo.local
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+    autoscaling:
+      minReplicas: 1
+      maxReplicas: 3
+      metricName: "http_requests_per_second"
+      averageValue: 10
+    serviceMonitor:
+      enabled: true
+      interval: 1s
+      path: /metrics
