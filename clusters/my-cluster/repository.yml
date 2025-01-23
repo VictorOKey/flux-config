@@ -80,7 +80,7 @@ metadata:
 spec:
   interval: 5m
   type: "oci"
-  url: oci://registry-1.docker.io/bitnamicharts/elasticsearch
+  url: oci://registry-1.docker.io/bitnamicharts
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
